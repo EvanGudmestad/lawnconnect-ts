@@ -1,0 +1,23 @@
+{
+  "name": "lawconnect-ts",
+  "version": "1.0.0",
+  "description": "Connecting mowing professionals with residential and business clients",
+  "homepage": "https://github.com/EvanGudmestad/lawnconnect-ts#readme",
+  "bugs": {
+    "url": "https://github.com/EvanGudmestad/lawnconnect-ts/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EvanGudmestad/lawnconnect-ts.git"
+  },
+  "license": "MIT",
+  "author": "Evan Gudmestad",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
