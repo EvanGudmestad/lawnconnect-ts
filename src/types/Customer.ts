@@ -12,5 +12,3 @@ export function getServiceInstructions(customerType: CustomerType): string {
     ? "Check in with the property manager or front desk before starting."
     : "Standard residential access — check the gate code on file.";
 }
-
-  

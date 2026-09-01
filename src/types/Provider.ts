@@ -6,3 +6,5 @@ export interface Provider {
   serviceAreaZipCodes: string[];
   servicesOffered: string[];
 }
+
+export type PublicProvider = Pick<Provider, "id" | "name" | "servicesOffered">;

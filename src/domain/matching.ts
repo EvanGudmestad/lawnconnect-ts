@@ -1,4 +1,4 @@
-import {Provider} from "../types/provider"
+import {Provider} from "../types/provider.js"
 
 const demoProviders: Provider[] = [
   {
