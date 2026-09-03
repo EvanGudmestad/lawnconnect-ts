@@ -1,4 +1,4 @@
-import {Provider} from "../types/provider.js"
+import { Provider } from "../types/Provider.js";
 
 const demoProviders: Provider[] = [
   {
@@ -24,11 +24,11 @@ const demoProviders: Provider[] = [
     phone: "555-987-6543",
     serviceAreaZipCodes: ["63109", "63110"],
     servicesOffered: ["mowing", "fertilizing", "leaf cleanup"],
-  }
+  },
 ];
 
-export async function findProvidersNearZip(zip:string) : Promise<Provider[]>{
-  try{
+export async function findProvidersNearZip(zip: string): Promise<Provider[]> {
+  try {
     //Eventually this will be a real DB call
     return findProvidersByZip(demoProviders, zip);
   } catch (error) {
@@ -37,10 +37,11 @@ export async function findProvidersNearZip(zip:string) : Promise<Provider[]>{
   }
 }
 
-
-
-export function findProvidersByZip(providers: Provider[], zip:string):Provider[]{
-  return providers.filter(p => p.serviceAreaZipCodes.includes(zip));
+export function findProvidersByZip(
+  providers: Provider[],
+  zip: string,
+): Provider[] {
+  return providers.filter((p) => p.serviceAreaZipCodes.includes(zip));
 }
 
 export function getProviderContact(provider?: Provider): string {
@@ -48,4 +49,3 @@ export function getProviderContact(provider?: Provider): string {
 }
 
 console.log(await findProvidersNearZip("63108")); // Output: Array of providers serving zip code 63108
-        
