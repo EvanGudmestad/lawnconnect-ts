@@ -1,6 +1,6 @@
 import { Provider } from "../types/Provider.js";
 
-const demoProviders: Provider[] = [
+export const demoProviders: Provider[] = [
   {
     id: "p1",
     name: "Sunrise Lawn Care",
@@ -22,7 +22,7 @@ const demoProviders: Provider[] = [
     name: "Lawn Legends",
     email: "lawnlegends@gmail.com",
     phone: "555-987-6543",
-    serviceAreaZipCodes: ["63109", "63110"],
+    serviceAreaZipCodes: ["63109"],
     servicesOffered: ["mowing", "fertilizing", "leaf cleanup"],
   },
 ];
