@@ -15,13 +15,14 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch --env-file .env src/index.ts",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/debug": "^4.1.13",
     "@types/express": "^5.0.6",
     "eslint": "^10.9.1",
     "eslint-config-prettier": "^10.1.8",
@@ -31,6 +32,7 @@
     "typescript-eslint": "^8.69.0"
   },
   "dependencies": {
+    "debug": "^4.4.3",
     "express": "^5.2.1"
   }
 }
