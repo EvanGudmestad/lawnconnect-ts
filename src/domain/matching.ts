@@ -48,4 +48,4 @@ export function getProviderContact(provider?: Provider): string {
   return provider?.phone ?? "No phone on file";
 }
 
-console.log(await findProvidersNearZip("63108")); // Output: Array of providers serving zip code 63108
+//console.log(await findProvidersNearZip("63108")); // Output: Array of providers serving zip code 63108

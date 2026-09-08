@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import {
   findProvidersNearZip,
   findProvidersByZip,
@@ -10,9 +10,19 @@ import { randomUUID } from "crypto";
 export const providersRouter = Router();
 
 // This route will run when the user visits http://localhost:3000/providers/
-providersRouter.get("/", (req: Request, res: Response) => {
-  res.json(demoProviders);
-});
+providersRouter.get(
+  "/",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const zip = req.query.zip as string | undefined;
+      res.json(zip ? await findProvidersNearZip(zip) : demoProviders);
+    } catch (err) {
+      next(err);
+    }
+
+    // res.json(demoProviders);
+  },
+);
 
 //this route will run when the user visits http://localhost:3000/providers/zip/:zip
 providersRouter.get("/zip/:zip", async (req: Request, res: Response) => {
@@ -39,6 +49,9 @@ providersRouter.get("/:id", (req: Request, res: Response) => {
 //route is http://localhost:3000/providers/
 providersRouter.post("/", (req: Request, res: Response) => {
   const { name, email, phone, serviceAreaZipCodes, servicesOffered } = req.body;
+  if (!name || !email) {
+    return res.status(400).json({ message: "Name and email are required" });
+  }
   const newProvider: Provider = {
     id: randomUUID(),
     name,
