@@ -2,7 +2,7 @@ import { Provider } from "../types/Provider.js";
 
 export const demoProviders: Provider[] = [
   {
-    id: "p1",
+    id: "1",
     name: "Sunrise Lawn Care",
     email: "contact@sunriselawn.com",
     phone: "555-201-4477",
@@ -10,7 +10,7 @@ export const demoProviders: Provider[] = [
     servicesOffered: ["mowing", "edging"],
   },
   {
-    id: "p2",
+    id: "2",
     name: "GreenScape Mowing",
     email: "hello@greenscapemowing.com",
     phone: undefined,
@@ -18,7 +18,7 @@ export const demoProviders: Provider[] = [
     servicesOffered: ["mowing"],
   },
   {
-    id: "p3",
+    id: "3",
     name: "Lawn Legends",
     email: "lawnlegends@gmail.com",
     phone: "555-987-6543",
