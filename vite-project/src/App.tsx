@@ -22,6 +22,7 @@ function App() {
 
   return (
     <>
+      <h1>CI/CD Demo</h1>
       <div style={{ fontFamily: "sans-serif", padding: "2rem" }}>
         {error && <p style={{ color: "red" }}>Error: {error}</p>}
         <ul>
