@@ -14,7 +14,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("http://localhost:3000/providers")
+    fetch("/providers")
       .then((res) => res.json())
       .then(setProviders)
       .catch((err) => setError(err.message));
