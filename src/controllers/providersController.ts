@@ -8,6 +8,10 @@ import {
   updateProviderById,
 } from "../domain/providers.js";
 import { ProviderDocument } from "../types/Provider.js";
+import {
+  CreateProviderInput,
+  UpdateProviderInput,
+} from "../schemas/providerSchemas.js";
 
 export async function listProviders(
   req: Request,
@@ -46,22 +50,9 @@ export async function createProvider(
   next: NextFunction,
 ) {
   try {
-    const { name, email, phone, serviceAreaZipCodes, servicesOffered } =
-      req.body;
-    if (!name || !email) {
-      res.status(400).json({ message: "Name and email are required" });
-    }
-
-    //construct new provider object
-    const newProvider = {
-      name,
-      email,
-      phone: phone || null,
-      serviceAreaZipCodes: serviceAreaZipCodes || [],
-      servicesOffered: servicesOffered || [],
-    };
-    const provider = await insertProvider(newProvider);
-    res.status(201).json(provider);
+    const input = req.body as CreateProviderInput;
+    const newProvider = await insertProvider(input);
+    res.status(201).json(newProvider);
   } catch (err) {
     next(err);
   }
@@ -90,17 +81,7 @@ export async function updateProvider(
   next: NextFunction,
 ) {
   try {
-    const { name, email, phone, serviceAreaZipCodes, servicesOffered } =
-      req.body;
-    const updates: Partial<Omit<ProviderDocument, "_id">> = {};
-    if (name !== undefined) updates.name = name;
-    if (email !== undefined) updates.email = email;
-    if (phone !== undefined) updates.phone = phone;
-    if (serviceAreaZipCodes !== undefined)
-      updates.serviceAreaZipCodes = serviceAreaZipCodes;
-    if (servicesOffered !== undefined)
-      updates.servicesOffered = servicesOffered;
-
+    const updates = req.body as UpdateProviderInput;
     const id = req.params.id as string;
     const provider = await updateProviderById(id, updates);
     if (!provider) {
