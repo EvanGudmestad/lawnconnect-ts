@@ -51,7 +51,10 @@ export async function createProvider(
 ) {
   try {
     const input = req.body as CreateProviderInput;
-    const newProvider = await insertProvider(input);
+    const newProvider = await insertProvider({
+      ...input,
+      createdBy: req.user, // Assuming req.user is populated by authentication middleware
+    });
     res.status(201).json(newProvider);
   } catch (err) {
     next(err);

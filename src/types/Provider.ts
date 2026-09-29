@@ -1,5 +1,10 @@
 import { ObjectId } from "mongodb";
 
+export interface ProviderUserRef {
+  userId: string; // BetterAuth's user id — placeholder for today's demo
+  fullName: string;
+}
+
 //Reports the structure of a provider object in the application
 export interface Provider {
   id: string;
@@ -8,6 +13,7 @@ export interface Provider {
   phone?: string;
   serviceAreaZipCodes: string[];
   servicesOffered: string[];
+  createdBy: ProviderUserRef;
 }
 
 export type PublicProvider = Pick<Provider, "id" | "name" | "servicesOffered">;
@@ -20,6 +26,7 @@ export interface ProviderDocument {
   phone?: string;
   serviceAreaZipCodes: string[];
   servicesOffered: string[];
+  createdBy: ProviderUserRef;
 }
 
 //Convert a document into a provider object
@@ -31,5 +38,6 @@ export function toProvider(doc: ProviderDocument): Provider {
     phone: doc.phone,
     serviceAreaZipCodes: doc.serviceAreaZipCodes,
     servicesOffered: doc.servicesOffered,
+    createdBy: doc.createdBy,
   };
 }

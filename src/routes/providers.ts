@@ -14,12 +14,18 @@ import {
   createProviderSchema,
   updateProviderSchema,
 } from "../schemas/providerSchemas.js";
+import { attachCurrentUser } from "../middleware/currentUser.js";
 
 export const providersRouter = Router();
 
 providersRouter.get("/", listProviders);
 providersRouter.get("/:id", getProviderById);
-providersRouter.post("/", validateBody(createProviderSchema), createProvider);
+providersRouter.post(
+  "/",
+  attachCurrentUser,
+  validateBody(createProviderSchema),
+  createProvider,
+);
 providersRouter.patch(
   "/:id",
   validateBody(updateProviderSchema),
