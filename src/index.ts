@@ -1,6 +1,7 @@
 import express from "express";
 import path from "node:path";
 import { providersRouter } from "./routes/providers.js";
+import { reviewsRouter } from "./routes/reviewsRouter.js";
 import { requestLogger } from "./middleware/logger.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { connectToDatabase, closeDatabaseConnection } from "./db.js";
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(express.static(path.join(import.meta.dirname, "../vite-project/dist")));
 
 app.use("/providers", providersRouter);
+app.use("/providers/:id/reviews", reviewsRouter);
 app.use(errorHandler);
 
 await connectToDatabase();
