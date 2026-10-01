@@ -1,6 +1,16 @@
 import { ObjectId } from "mongodb";
 import { getProvidersCollection } from "../db.js";
-import { Provider, toProvider, ProviderDocument } from "../types/Provider.js";
+import {
+  Provider,
+  toProvider,
+  ProviderDocument,
+  ProviderUserRef,
+} from "../types/Provider.js";
+import { randomUUID } from "node:crypto";
+import {
+  CreateReviewInput,
+  UpdateReviewInput,
+} from "../schemas/reviewSchema.js";
 
 export async function findAllProviders(): Promise<Provider[]> {
   const docs = await getProvidersCollection().find().toArray();
@@ -55,7 +65,57 @@ export async function updateProviderById(
   return result ? toProvider(result) : null;
 }
 
-//   return provider?.phone ?? "No phone on file";
-// }
+export async function addReviewToProvider(
+  providerId: string,
+  input: CreateReviewInput,
+  author: ProviderUserRef,
+): Promise<Provider | null> {
+  if (!ObjectId.isValid(providerId)) return null;
+  const review = {
+    _id: randomUUID(),
+    ...input,
+    createdAt: new Date(),
+    author,
+  };
+  const result = await getProvidersCollection().findOneAndUpdate(
+    { _id: new ObjectId(providerId) },
+    { $push: { reviews: review } },
+    { returnDocument: "after" },
+  );
+  return result ? toProvider(result) : null;
+}
 
-//console.log(await findProvidersNearZip("63108")); // Output: Array of providers serving zip code 63108
+export async function removeReviewFromProvider(
+  providerId: string,
+  reviewId: string,
+): Promise<boolean> {
+  if (!ObjectId.isValid(providerId)) return false;
+  const result = await getProvidersCollection().findOneAndUpdate(
+    { _id: new ObjectId(providerId) },
+    { $pull: { reviews: { _id: reviewId } } },
+  );
+  return result !== null;
+}
+
+export async function updateReviewOnProvider(
+  providerId: string,
+  reviewId: string,
+  updates: UpdateReviewInput,
+): Promise<Provider | null> {
+  if (!ObjectId.isValid(providerId)) return null;
+  const result = await getProvidersCollection().findOneAndUpdate(
+    { _id: new ObjectId(providerId) },
+    {
+      $set: {
+        ...(updates.rating !== undefined && {
+          "reviews.$[review].rating": updates.rating,
+        }),
+        ...(updates.comment !== undefined && {
+          "reviews.$[review].comment": updates.comment,
+        }),
+      },
+    },
+    { arrayFilters: [{ "review._id": reviewId }], returnDocument: "after" },
+  );
+  return result ? toProvider(result) : null;
+}
