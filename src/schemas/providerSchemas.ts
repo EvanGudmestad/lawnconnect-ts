@@ -23,6 +23,7 @@ export const updateProviderSchema = providerFields
 export const listProvidersQuerySchema = z.object({
   zip: z.string().optional(),
   service: z.string().optional(),
+  q: z.string().optional(),
   sort: z.enum(["name", "-name", "email", "-email"]).optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(20),
