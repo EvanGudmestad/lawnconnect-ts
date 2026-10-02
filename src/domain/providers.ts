@@ -1,22 +1,27 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, Filter } from "mongodb";
 import { getProvidersCollection } from "../db.js";
 import { Provider, toProvider, ProviderDocument } from "../types/Provider.js";
+import { ListProvidersQuery } from "../schemas/providerSchemas.js";
 
-export async function findAllProviders(): Promise<Provider[]> {
-  const docs = await getProvidersCollection().find().toArray();
-  return docs.map(toProvider);
-}
+export async function findProviders(
+  query: ListProvidersQuery,
+): Promise<Provider[]> {
+  const filter: Filter<ProviderDocument> = {};
+  if (query.zip) filter.serviceAreaZipCodes = query.zip;
+  if (query.service) filter.servicesOffered = query.service;
 
-export async function findProvidersNearZip(zip: string): Promise<Provider[]> {
-  try {
-    const docs = await getProvidersCollection()
-      .find({ serviceAreaZipCodes: zip })
-      .toArray();
-    return docs.map(toProvider);
-  } catch (error) {
-    console.error("findProvidersNearZip failed:", error);
-    return [];
+  const cursor = getProvidersCollection().find(filter);
+
+  if (query.sort) {
+    const descending = query.sort.startsWith("-");
+    const field: string = descending ? query.sort.slice(1) : query.sort;
+    cursor.sort({ [field]: descending ? -1 : 1 });
   }
+  const skip = (query.page - 1) * query.limit;
+  cursor.skip(skip).limit(query.limit);
+
+  const docs = await cursor.toArray();
+  return docs.map(toProvider);
 }
 
 export async function findProviderById(id: string): Promise<Provider | null> {

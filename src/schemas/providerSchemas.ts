@@ -20,6 +20,16 @@ export const updateProviderSchema = providerFields
     message: "At least one field must be provided",
   });
 
+export const listProvidersQuerySchema = z.object({
+  zip: z.string().optional(),
+  service: z.string().optional(),
+  sort: z.enum(["name", "-name", "email", "-email"]).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+});
+
+export type ListProvidersQuery = z.infer<typeof listProvidersQuerySchema>;
+
 export type UpdateProviderInput = z.infer<typeof updateProviderSchema>;
 
 export type CreateProviderInput = z.infer<typeof createProviderSchema>;

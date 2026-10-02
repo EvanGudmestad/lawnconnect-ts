@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import {
-  findAllProviders,
-  findProvidersNearZip,
   findProviderById,
   insertProvider,
   deleteProviderById,
@@ -12,6 +10,8 @@ import {
   CreateProviderInput,
   UpdateProviderInput,
 } from "../schemas/providerSchemas.js";
+import { findProviders } from "../domain/providers.js";
+import { ListProvidersQuery } from "../schemas/providerSchemas.js";
 
 export async function listProviders(
   req: Request,
@@ -19,8 +19,8 @@ export async function listProviders(
   next: NextFunction,
 ) {
   try {
-    const zip = req.query.zip as string | undefined;
-    res.json(zip ? await findProvidersNearZip(zip) : await findAllProviders());
+    const query = req.query as unknown as ListProvidersQuery;
+    res.json(await findProviders(query));
   } catch (err) {
     next(err);
   }

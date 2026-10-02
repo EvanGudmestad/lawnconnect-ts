@@ -14,10 +14,16 @@ import {
   createProviderSchema,
   updateProviderSchema,
 } from "../schemas/providerSchemas.js";
+import { validateQuery } from "../middleware/validate.js";
+import { listProvidersQuerySchema } from "../schemas/providerSchemas.js";
 
 export const providersRouter = Router();
 
-providersRouter.get("/", listProviders);
+providersRouter.get(
+  "/",
+  validateQuery(listProvidersQuerySchema),
+  listProviders,
+);
 providersRouter.get("/:id", getProviderById);
 providersRouter.post("/", validateBody(createProviderSchema), createProvider);
 providersRouter.patch(
