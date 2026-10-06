@@ -19,19 +19,23 @@
     "build": "tsc && npm install --prefix vite-project && npm run build --prefix vite-project",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/cors": "^2.8.19",
     "@types/debug": "^4.1.13",
     "@types/express": "^5.0.6",
+    "@types/supertest": "^7.2.1",
     "eslint": "^10.9.1",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.6",
+    "supertest": "^7.3.1",
     "tsx": "^4.23.13",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.69.0"
+    "typescript-eslint": "^8.69.0",
+    "vitest": "^5.0.3"
   },
   "dependencies": {
     "cors": "^2.8.6",
