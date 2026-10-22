@@ -16,6 +16,7 @@ const client = new MongoClient(MONGO_URI);
 let db: Db;
 
 export async function connectToDatabase(): Promise<Db> {
+  if (db) return db; // already connected: hand back the same Db
   await client.connect();
   db = client.db(DB_NAME);
   return db;
