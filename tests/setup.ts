@@ -4,6 +4,11 @@ import { vi } from "vitest";
 vi.mock("../src/auth.js", () => ({
   auth: {
     handler: vi.fn(async () => new Response(null, { status: 404 })),
-    api: { getSession: vi.fn().mockResolvedValue(null) },
+    api: {
+      // By default every test is "signed in" as Pat Provider.
+      getSession: vi.fn().mockResolvedValue({
+        user: { id: "64f0c0ffee0c0ffee0c0ff01", name: "Pat Provider" },
+      }),
+    },
   },
 }));

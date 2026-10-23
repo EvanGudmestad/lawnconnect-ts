@@ -8,6 +8,7 @@ export interface Provider {
   phone?: string;
   serviceAreaZipCodes: string[];
   servicesOffered: string[];
+  createdBy?: ProviderUserRef;
 }
 
 export type PublicProvider = Pick<Provider, "id" | "name" | "servicesOffered">;
@@ -20,6 +21,7 @@ export interface ProviderDocument {
   phone?: string;
   serviceAreaZipCodes: string[];
   servicesOffered: string[];
+  createdBy?: ProviderUserRef;
 }
 
 //Convert a document into a provider object
@@ -32,4 +34,9 @@ export function toProvider(doc: ProviderDocument): Provider {
     serviceAreaZipCodes: doc.serviceAreaZipCodes,
     servicesOffered: doc.servicesOffered,
   };
+}
+
+export interface ProviderUserRef {
+  userId: string;
+  fullName: string;
 }

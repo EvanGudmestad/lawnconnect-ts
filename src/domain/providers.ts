@@ -3,6 +3,10 @@ import { getProvidersCollection } from "../db.js";
 import { Provider, toProvider, ProviderDocument } from "../types/Provider.js";
 import { ListProvidersQuery } from "../schemas/providerSchemas.js";
 
+import debug from "debug";
+
+const logger = debug("lawnconnect:providers");
+
 export async function findProviders(
   query: ListProvidersQuery,
 ): Promise<Provider[]> {
@@ -55,6 +59,7 @@ export async function insertProvider(
   input: Omit<ProviderDocument, "_id">,
 ): Promise<Provider> {
   const collection = getProvidersCollection();
+  logger("Inserting provider:", input);
   const result = await collection.insertOne(input);
   const doc = await collection.findOne({ _id: result.insertedId });
   return toProvider(doc!);

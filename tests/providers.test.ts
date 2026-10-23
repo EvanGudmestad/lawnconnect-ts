@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import request from "supertest";
 import { app } from "../src/app.js";
 import * as domain from "../src/domain/providers.js";
+import { auth } from "../src/auth.js";
 
 vi.mock("../src/domain/providers.js", () => ({
   findProviders: vi.fn(),
@@ -22,6 +23,10 @@ const sampleProvider = {
 
 beforeEach(() => {
   vi.resetAllMocks();
+  // resetAllMocks also wipes the signed-in stand-in from tests/setup.ts, so put it back.
+  vi.mocked(auth.api.getSession).mockResolvedValue({
+    user: { id: "64f0c0ffee0c0ffee0c0ff01", name: "Pat Provider" },
+  } as never);
 });
 
 describe("POST /providers", () => {
