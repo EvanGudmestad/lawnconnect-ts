@@ -12,12 +12,6 @@ const providerFields = z.strictObject({
 export const createProviderSchema = providerFields.extend({
   serviceAreaZipCodes: z.array(z.string()).default([]),
   servicesOffered: z.array(z.string()).default([]),
-  createdBy: z
-    .object({
-      userId: z.string(),
-      fullName: z.string(),
-    })
-    .optional(),
 });
 
 export const updateProviderSchema = providerFields

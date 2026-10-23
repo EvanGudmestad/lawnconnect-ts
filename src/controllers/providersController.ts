@@ -51,11 +51,8 @@ export async function createProvider(
 ) {
   try {
     const input = req.body as CreateProviderInput;
-    input.createdBy = {
-      userId: req.user!.userId,
-      fullName: req.user!.fullName,
-    };
-    const newProvider = await insertProvider(input);
+
+    const newProvider = await insertProvider({ ...input, createdBy: req.user });
     res.status(201).json(newProvider);
   } catch (err) {
     next(err);

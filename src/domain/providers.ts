@@ -59,7 +59,6 @@ export async function insertProvider(
   input: Omit<ProviderDocument, "_id">,
 ): Promise<Provider> {
   const collection = getProvidersCollection();
-  logger("Inserting provider:", input);
   const result = await collection.insertOne(input);
   const doc = await collection.findOne({ _id: result.insertedId });
   return toProvider(doc!);
