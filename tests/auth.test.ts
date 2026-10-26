@@ -43,12 +43,24 @@ describe("nobody signed in", () => {
 });
 
 describe("GET /api/me", () => {
-  it("returns the signed-in person from the session", async () => {
+  it("returns the signed-in person and their role from the session", async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValue({
+      user: {
+        id: "64f0c0ffee0c0ffee0c0ff01",
+        name: "Pat Provider",
+        role: "provider",
+      },
+    } as never);
     const res = await request(app).get("/api/me");
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       userId: "64f0c0ffee0c0ffee0c0ff01",
       fullName: "Pat Provider",
+      role: "provider",
     });
+  });
+  it('shows "none" for an account with no role field', async () => {
+    const res = await request(app).get("/api/me");
+    expect(res.body.role).toBe("none");
   });
 });

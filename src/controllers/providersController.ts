@@ -5,7 +5,7 @@ import {
   deleteProviderById,
   updateProviderById,
 } from "../domain/providers.js";
-import { ProviderDocument } from "../types/Provider.js";
+//import { ProviderDocument } from "../types/Provider.js";
 import {
   CreateProviderInput,
   UpdateProviderInput,

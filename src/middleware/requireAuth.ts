@@ -16,6 +16,7 @@ export async function requireAuth(
   }
 
   req.user = { userId: session.user.id, fullName: session.user.name };
+  req.role = session.user.role ?? "none";
 
   next();
 }

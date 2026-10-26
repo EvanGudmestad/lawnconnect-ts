@@ -16,7 +16,7 @@ import {
 } from "../schemas/providerSchemas.js";
 import { validateQuery } from "../middleware/validate.js";
 import { listProvidersQuerySchema } from "../schemas/providerSchemas.js";
-
+import { requirePermission } from "../middleware/requirePermission.js";
 export const providersRouter = Router();
 
 providersRouter.get(
@@ -25,10 +25,20 @@ providersRouter.get(
   listProviders,
 );
 providersRouter.get("/:id", getProviderById);
-providersRouter.post("/", validateBody(createProviderSchema), createProvider);
+providersRouter.post(
+  "/",
+  requirePermission("provider", "create"),
+  validateBody(createProviderSchema),
+  createProvider,
+);
 providersRouter.patch(
   "/:id",
+  requirePermission("provider", "update"),
   validateBody(updateProviderSchema),
   updateProvider,
 );
-providersRouter.delete("/:id", deleteProvider);
+providersRouter.delete(
+  "/:id",
+  requirePermission("provider", "delete"),
+  deleteProvider,
+);

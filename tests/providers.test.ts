@@ -27,6 +27,9 @@ beforeEach(() => {
   vi.mocked(auth.api.getSession).mockResolvedValue({
     user: { id: "64f0c0ffee0c0ffee0c0ff01", name: "Pat Provider" },
   } as never);
+  vi.mocked(auth.api.userHasPermission).mockResolvedValue({
+    success: true,
+  } as never);
 });
 
 describe("POST /providers", () => {
