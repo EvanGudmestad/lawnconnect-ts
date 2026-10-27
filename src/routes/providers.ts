@@ -17,6 +17,9 @@ import {
 import { validateQuery } from "../middleware/validate.js";
 import { listProvidersQuerySchema } from "../schemas/providerSchemas.js";
 import { requirePermission } from "../middleware/requirePermission.js";
+import { loadProvider } from "../middleware/loadProvider.js";
+import { canEditProvider } from "../providerRules.js";
+import { requireProviderRule } from "../middleware/requireProviderRule.js";
 export const providersRouter = Router();
 
 providersRouter.get(
@@ -34,6 +37,11 @@ providersRouter.post(
 providersRouter.patch(
   "/:id",
   requirePermission("provider", "update"),
+  loadProvider,
+  requireProviderRule(
+    canEditProvider,
+    "Only the provider who created this listing may edit it.",
+  ),
   validateBody(updateProviderSchema),
   updateProvider,
 );

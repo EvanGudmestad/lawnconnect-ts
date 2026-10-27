@@ -19,6 +19,7 @@ const sampleProvider = {
   phone: "555-0101",
   serviceAreaZipCodes: ["63108"],
   servicesOffered: ["mowing"],
+  createdBy: { userId: "64f0c0ffee0c0ffee0c0ff01", fullName: "Pat Provider" },
 };
 
 beforeEach(() => {

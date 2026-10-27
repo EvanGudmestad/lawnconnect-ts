@@ -17,7 +17,7 @@ export const roles = {
     provider: ["create", "update"],
   }),
   admin: ac.newRole({
-    provider: ["delete"],
+    provider: ["delete", "create", "update"],
     user: ["set-role"],
   }),
 };

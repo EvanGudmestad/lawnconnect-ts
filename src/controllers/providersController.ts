@@ -84,7 +84,13 @@ export async function updateProvider(
   try {
     const updates = req.body as UpdateProviderInput;
     const id = req.params.id as string;
-    const provider = await updateProviderById(id, updates);
+    //const provider = await updateProviderById(id, updates);
+    const provider = await updateProviderById(id, {
+      ...updates,
+      updatedBy: req.user,
+      updatedAt: new Date(),
+    });
+
     if (!provider) {
       return res.status(404).json({ error: "Provider not found" });
     }
