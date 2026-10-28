@@ -113,6 +113,8 @@ describe("GET /providers/:id", () => {
 describe("PATCH /providers/:id", () => {
   it("updates only the fields that were sent and returns the updated provider", async () => {
     const updated = { ...sampleProvider, phone: "555-0199" };
+    // loadProvider looks the provider up first; the signed-in user is its creator.
+    vi.mocked(domain.findProviderById).mockResolvedValue(sampleProvider);
     vi.mocked(domain.updateProviderById).mockResolvedValue(updated);
 
     const res = await request(app)
@@ -123,6 +125,8 @@ describe("PATCH /providers/:id", () => {
     expect(res.body).toEqual(updated);
     expect(domain.updateProviderById).toHaveBeenCalledWith(sampleProvider.id, {
       phone: "555-0199",
+      updatedAt: expect.any(Date),
+      updatedBy: { userId: "64f0c0ffee0c0ffee0c0ff01", fullName: "Pat Provider" },
     });
   });
 });

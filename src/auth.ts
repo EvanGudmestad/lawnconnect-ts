@@ -18,6 +18,13 @@ export const auth = betterAuth({
   trustedOrigins: [requireEnv("CLIENT_ORIGIN")],
   database: mongodbAdapter(db),
   emailAndPassword: { enabled: true },
+  socialProviders: {
+    google: {
+      clientId: requireEnv("GOOGLE_CLIENT_ID"),
+      clientSecret: requireEnv("GOOGLE_CLIENT_SECRET"),
+    },
+  },
+
   plugins: [
     admin({
       ac,
