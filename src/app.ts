@@ -8,6 +8,7 @@ import { requestLogger } from "./middleware/logger.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { requireAuth } from "./middleware/requireAuth.js";
 import { usersRouter } from "./routes/users.js";
+import { assistantRouter } from "./routes/assistant.js";
 
 export const app = express();
 app.use(cors());
@@ -17,6 +18,7 @@ app.all("/api/auth/*splat", toNodeHandler(auth));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(import.meta.dirname, "../vite-project/dist")));
+app.use("/assistant", requireAuth, assistantRouter);
 app.use("/providers", requireAuth, providersRouter);
 app.use("/users", requireAuth, usersRouter);
 app.get("/api/me", requireAuth, (req, res) => {
