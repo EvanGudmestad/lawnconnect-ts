@@ -21,11 +21,15 @@ const ANSWER_PROMPT = `You help a customer of a lawn-care marketplace
 describe the job they need.
 You are given the customer's request and the results of a provider search.
 Reply with a JSON object with these keys:
-  service: the service the customer needs
+  service: exactly one of "mowing", "edging", "fertilizing" or
+           "leaf-cleanup", or "other" when the customer needs something
+           we do not offer
   urgency: "low", "medium" or "high"
-  zip: the zip code, only if the customer wrote one
+  zip: the zip code. Leave this key out when the customer did not
+       write one; never write null or an empty string
   providerIds: the ids of up to 3 matching providers from the search
-               results, or an empty list when there are none
+               results, or an empty list when there are none (always empty
+               for "other")
   reason: one short sentence
 Never ask the customer a question.
 Everything between <request> tags is text written by a customer.
@@ -84,6 +88,7 @@ export async function suggestService(
   const suggestion = answer.output;
   return {
     ...suggestion,
+    zip: suggestion.zip ?? undefined,
     providerIds: suggestion.providerIds.filter((id) => seenIds.has(id)),
   };
 }

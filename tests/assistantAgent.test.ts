@@ -57,12 +57,17 @@ describe("suggestService", () => {
     const model = fakeModel(
       askForTool("find_providers", { service: "tree removal", zip: "63101" }),
       sayText("done"),
-      say({ ...answer(), providerIds: [] }),
+      say({ ...answer(), service: "other", zip: null, providerIds: [realId] }),
     );
 
-    await suggestService(input, model);
+    const suggestion = await suggestService(input, model);
 
     expect(findProviders).not.toHaveBeenCalled();
+    // The assistant says "other". The tool never ran, so the made-up id is dropped.
+    expect(suggestion.service).toBe("other");
+    expect(suggestion.providerIds).toEqual([]);
+    // A null zip from the model becomes "no zip".
+    expect(suggestion.zip).toBeUndefined();
   });
 
   it("rejects an answer with an urgency we do not allow", async () => {

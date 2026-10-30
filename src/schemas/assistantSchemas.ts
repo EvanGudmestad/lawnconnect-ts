@@ -15,12 +15,15 @@ export const assistantInputSchema = z.strictObject({
 // What the assistant must send back. The model has to fit this shape
 // or the answer is thrown away.
 export const assistantSuggestionSchema = z.object({
-  service: z.enum(serviceNames),
+  // "other" lets the assistant say "we do not offer that" instead of failing.
+  service: z.enum([...serviceNames, "other"]),
   urgency: z.enum(["low", "medium", "high"]),
+  // Models often write null for "not given", so null is allowed here and
+  // turned into "no zip" by the agent.
   zip: z
     .string()
     .regex(/^\d{5}$/)
-    .optional(),
+    .nullish(),
   providerIds: z.array(z.string().regex(/^[0-9a-f]{24}$/)).max(3),
   reason: z.string().min(1).max(300),
 });

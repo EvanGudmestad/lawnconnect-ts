@@ -6,7 +6,7 @@ import {
   retryAfterSeconds,
 } from "../agent/groqErrors.js";
 import type { AssistantInput } from "../schemas/assistantSchemas.js";
-
+ 
 export async function suggest(req: Request, res: Response, next: NextFunction) {
   try {
     const suggestion = await suggestService(req.body as AssistantInput);
@@ -21,6 +21,8 @@ export async function suggest(req: Request, res: Response, next: NextFunction) {
       return;
     }
     if (isUnusableAnswer(err)) {
+      // The customer sees a short message; the terminal keeps the real reason.
+      console.error(err);
       res.status(502).json({
         error: "The assistant gave an answer I could not use. Try again.",
       });

@@ -43,6 +43,7 @@ function groqError(statusCode: number, extra: Partial<ConstructorParameters<type
 describe("POST /assistant", () => {
   beforeEach(() => {
     suggestService.mockReset();
+    vi.spyOn(console, "error").mockImplementation(() => {}); // the 502 tests log on purpose
     getSession.mockResolvedValue({ user: { id: "u1", name: "Dana Dev" } });
   });
 
