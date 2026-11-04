@@ -16,7 +16,7 @@ app.use(requestLogger);
 app.all("/api/auth/*splat", toNodeHandler(auth));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(import.meta.dirname, "../vite-project/dist")));
+app.use(express.static(path.join(import.meta.dirname, "../frontend/dist")));
 app.use("/providers", requireAuth, providersRouter);
 app.use("/users", requireAuth, usersRouter);
 app.get("/api/me", requireAuth, (req, res) => {

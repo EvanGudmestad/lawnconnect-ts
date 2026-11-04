@@ -16,7 +16,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch --env-file .env src/index.ts",
-    "build": "tsc && npm install --prefix vite-project && npm run build --prefix vite-project",
+    "build": "tsc && npm install --prefix frontend && npm run build --prefix frontend",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
