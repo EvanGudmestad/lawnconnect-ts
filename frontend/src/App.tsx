@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { ProviderList } from "./components/ProviderList.tsx";
 import type { Provider } from "./types.ts";
+import { AddProviderForm } from "./components/AddProviderForm.tsx";
 
 const sampleData: Provider[] = [
   {
@@ -26,11 +28,25 @@ const sampleData: Provider[] = [
 ];
 
 function App() {
+  const [providers, setProviders] = useState<Provider[]>(sampleData);
+
+  function handleDelete(id: string) {
+    setProviders((current) => current.filter((p) => p.id !== id));
+  }
+
+  function handleAdd(draft: Omit<Provider, "id">) {
+    setProviders((current) => [
+      ...current,
+      { id: crypto.randomUUID(), ...draft },
+    ]);
+  }
+
   return (
     <>
       <main>
         <h1>LawnConnect</h1>
-        <ProviderList providers={sampleData} />
+        <AddProviderForm onAdd={handleAdd} />
+        <ProviderList providers={providers} onDelete={handleDelete} />
       </main>
     </>
   );
