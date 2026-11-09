@@ -13,11 +13,11 @@ export function ProviderListPage() {
 
   useEffect(() => {
     let ignore = false;
-    listProviders()
-      .then((providers) => {
+    const load = async () => {
+      try {
+        const providers = await listProviders();
         if (!ignore) setState({ kind: "loaded", providers });
-      })
-      .catch((err: unknown) => {
+      } catch (err) {
         if (ignore) return;
         setState({
           kind: "error",
@@ -26,7 +26,9 @@ export function ProviderListPage() {
               ? err.message
               : "Could not reach the server",
         });
-      });
+      }
+    };
+    load();
     return () => {
       ignore = true;
     };
