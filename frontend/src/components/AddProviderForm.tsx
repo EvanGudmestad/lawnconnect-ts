@@ -1,8 +1,9 @@
 import { useState } from "react";
-import type { Provider } from "../types";
+import { ApiError } from "../api";
+import type { ProviderDraft } from "../api";
 
 type AddProviderFormProps = {
-  onAdd: (provider: Omit<Provider, "id">) => void;
+  onAdd: (provider: ProviderDraft) => Promise<void>;
 };
 
 const splitList = (text: string) =>
@@ -17,8 +18,9 @@ export function AddProviderForm({ onAdd }: AddProviderFormProps) {
   const [zips, setZips] = useState("");
   const [services, setServices] = useState("");
   const [problems, setProblems] = useState<string[]>([]);
+  const [busy, setBusy] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const found: string[] = [];
     if (name.trim() === "") found.push("Name is required");
@@ -26,16 +28,25 @@ export function AddProviderForm({ onAdd }: AddProviderFormProps) {
     setProblems(found);
     if (found.length > 0) return;
 
-    onAdd({
-      name: name.trim(),
-      email: email.trim(),
-      serviceAreaZipCodes: splitList(zips),
-      servicesOffered: splitList(services),
-    });
-    setName("");
-    setEmail("");
-    setZips("");
-    setServices("");
+    setBusy(true);
+    try {
+      await onAdd({
+        name: name.trim(),
+        email: email.trim(),
+        serviceAreaZipCodes: splitList(zips),
+        servicesOffered: splitList(services),
+      });
+      setName("");
+      setEmail("");
+      setZips("");
+      setServices("");
+    } catch (err) {
+      setProblems([
+        err instanceof ApiError ? err.message : "Could not reach the server",
+      ]);
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -73,7 +84,9 @@ export function AddProviderForm({ onAdd }: AddProviderFormProps) {
           ))}
         </ul>
       )}
-      <button type="submit">Add provider</button>
+      <button type="submit" disabled={busy}>
+        Add provider
+      </button>
     </form>
   );
 }
