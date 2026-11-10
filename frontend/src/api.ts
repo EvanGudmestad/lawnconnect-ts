@@ -38,3 +38,25 @@ export async function listProviders(): Promise<Provider[]> {
   const res = await send("/providers");
   return z.array(providerSchema).parse(await res.json());
 }
+
+export type ProviderDraft = Omit<
+  Provider,
+  "id" | "createdBy" | "updatedBy" | "updatedAt"
+>;
+
+function withBody(method: string, body: unknown): RequestInit {
+  return {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  };
+}
+
+export async function createProvider(draft: ProviderDraft): Promise<Provider> {
+  const res = await send("/providers", withBody("POST", draft));
+  return providerSchema.parse(await res.json());
+}
+
+export async function deleteProvider(id: string): Promise<void> {
+  await send(`/providers/${id}`, { method: "DELETE" });
+}
