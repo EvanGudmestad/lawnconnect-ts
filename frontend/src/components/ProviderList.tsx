@@ -4,10 +4,15 @@ import { ProviderCard } from "./ProviderCard";
 
 type ProviderListProps = {
   providers: Provider[];
+  onSelect?: (id: string) => void;
   onDelete?: (id: string) => void;
 };
 
-export function ProviderList({ providers, onDelete }: ProviderListProps) {
+export function ProviderList({
+  providers,
+  onSelect,
+  onDelete,
+}: ProviderListProps) {
   const [service, setService] = useState("all");
   const services = [
     ...new Set(providers.flatMap((p) => p.servicesOffered)),
@@ -39,7 +44,11 @@ export function ProviderList({ providers, onDelete }: ProviderListProps) {
         <ul>
           {shown.map((p) => (
             <li key={p.id}>
-              <ProviderCard provider={p} onDelete={onDelete} />
+              <ProviderCard
+                provider={p}
+                onSelect={onSelect}
+                onDelete={onDelete}
+              />
             </li>
           ))}
         </ul>

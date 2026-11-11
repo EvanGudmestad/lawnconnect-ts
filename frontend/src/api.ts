@@ -60,3 +60,16 @@ export async function createProvider(draft: ProviderDraft): Promise<Provider> {
 export async function deleteProvider(id: string): Promise<void> {
   await send(`/providers/${id}`, { method: "DELETE" });
 }
+
+export async function getProvider(id: string): Promise<Provider> {
+  const res = await send(`/providers/${id}`);
+  return providerSchema.parse(await res.json());
+}
+
+export async function updateProvider(
+  id: string,
+  changes: Partial<ProviderDraft>,
+): Promise<Provider> {
+  const res = await send(`/providers/${id}`, withBody("PATCH", changes));
+  return providerSchema.parse(await res.json());
+}

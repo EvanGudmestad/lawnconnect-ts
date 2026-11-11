@@ -18,7 +18,11 @@ type LoadState =
 const messageFor = (err: unknown) =>
   err instanceof ApiError ? err.message : "Could not reach the server";
 
-export function ProviderListPage() {
+type ProviderListPageProps = {
+  onSelect?: (id: string) => void;
+};
+
+export function ProviderListPage({ onSelect }: ProviderListPageProps) {
   const [state, setState] = useState<LoadState>({ kind: "loading" });
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -29,14 +33,7 @@ export function ProviderListPage() {
         const providers = await listProviders();
         if (!ignore) setState({ kind: "loaded", providers });
       } catch (err) {
-        if (ignore) return;
-        setState({
-          kind: "error",
-          message:
-            err instanceof ApiError
-              ? err.message
-              : "Could not reach the server",
-        });
+        if (!ignore) setState({ kind: "error", message: messageFor(err) });
       }
     };
     load();
@@ -70,6 +67,7 @@ export function ProviderListPage() {
 
   if (state.kind === "loading") return <p role="status">Loading providers…</p>;
   if (state.kind === "error") return <p role="alert">{state.message}</p>;
+
   return (
     <div>
       <AddProviderForm onAdd={handleAdd} />
@@ -77,7 +75,11 @@ export function ProviderListPage() {
       {state.providers.length === 0 ? (
         <p>No providers yet. Add the first one.</p>
       ) : (
-        <ProviderList providers={state.providers} onDelete={handleDelete} />
+        <ProviderList
+          providers={state.providers}
+          onSelect={onSelect}
+          onDelete={handleDelete}
+        />
       )}
     </div>
   );

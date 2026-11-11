@@ -3,10 +3,15 @@ import type { Provider } from "../types";
 
 type ProviderCardProps = {
   provider: Provider;
+  onSelect?: (id: string) => void;
   onDelete?: (id: string) => void;
 };
 
-export function ProviderCard({ provider, onDelete }: ProviderCardProps) {
+export function ProviderCard({
+  provider,
+  onSelect,
+  onDelete,
+}: ProviderCardProps) {
   const [confirming, setConfirming] = useState(false);
 
   return (
@@ -14,6 +19,11 @@ export function ProviderCard({ provider, onDelete }: ProviderCardProps) {
       <h3>{provider.name}</h3>
       <p>Offers {provider.servicesOffered.join(", ")}</p>
       <p>Serves {provider.serviceAreaZipCodes.join(", ")}</p>
+      {onSelect && (
+        <button type="button" onClick={() => onSelect(provider.id)}>
+          View
+        </button>
+      )}
       {onDelete && !confirming && (
         <button type="button" onClick={() => setConfirming(true)}>
           Delete

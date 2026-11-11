@@ -4,6 +4,9 @@ import type { ProviderDraft } from "../api";
 
 type AddProviderFormProps = {
   onAdd: (provider: ProviderDraft) => Promise<void>;
+  initial?: ProviderDraft;
+  submitLabel?: string;
+  clearOnSuccess?: boolean;
 };
 
 const splitList = (text: string) =>
@@ -12,11 +15,20 @@ const splitList = (text: string) =>
     .map((s) => s.trim())
     .filter((s) => s !== "");
 
-export function AddProviderForm({ onAdd }: AddProviderFormProps) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [zips, setZips] = useState("");
-  const [services, setServices] = useState("");
+export function AddProviderForm({
+  onAdd,
+  initial,
+  submitLabel = "Add provider",
+  clearOnSuccess = true,
+}: AddProviderFormProps) {
+  const [name, setName] = useState(initial?.name ?? "");
+  const [email, setEmail] = useState(initial?.email ?? "");
+  const [zips, setZips] = useState(
+    initial?.serviceAreaZipCodes.join(", ") ?? "",
+  );
+  const [services, setServices] = useState(
+    initial?.servicesOffered.join(", ") ?? "",
+  );
   const [problems, setProblems] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
 
@@ -36,10 +48,12 @@ export function AddProviderForm({ onAdd }: AddProviderFormProps) {
         serviceAreaZipCodes: splitList(zips),
         servicesOffered: splitList(services),
       });
-      setName("");
-      setEmail("");
-      setZips("");
-      setServices("");
+      if (clearOnSuccess) {
+        setName("");
+        setEmail("");
+        setZips("");
+        setServices("");
+      }
     } catch (err) {
       setProblems([
         err instanceof ApiError ? err.message : "Could not reach the server",
@@ -85,7 +99,7 @@ export function AddProviderForm({ onAdd }: AddProviderFormProps) {
         </ul>
       )}
       <button type="submit" disabled={busy}>
-        Add provider
+        {submitLabel}
       </button>
     </form>
   );
