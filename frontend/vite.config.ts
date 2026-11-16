@@ -1,9 +1,17 @@
 import react from "@vitejs/plugin-react";
+import path from "path/win32";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: {
+      "@": path.resolve(import.meta.dirname, "./src"),
+    },
+  },
+
   server: {
     // Vite forwards these paths to your Express server on port 3000.
     proxy: {

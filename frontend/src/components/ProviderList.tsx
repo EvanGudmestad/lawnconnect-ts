@@ -1,4 +1,8 @@
 import { useState } from "react";
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from "@/components/ui/native-select";
 import type { Provider } from "../types";
 import { ProviderCard } from "./ProviderCard";
 
@@ -23,25 +27,28 @@ export function ProviderList({
       : providers.filter((p) => p.servicesOffered.includes(service));
 
   return (
-    <section>
-      <label>
-        Filter by service{" "}
-        <select value={service} onChange={(e) => setService(e.target.value)}>
-          <option value="all">all</option>
+    <section className="flex flex-col gap-4">
+      <label className="flex items-center gap-2 text-sm">
+        Filter by service
+        <NativeSelect
+          value={service}
+          onChange={(e) => setService(e.target.value)}
+        >
+          <NativeSelectOption value="all">all</NativeSelectOption>
           {services.map((s) => (
-            <option key={s} value={s}>
+            <NativeSelectOption key={s} value={s}>
               {s}
-            </option>
+            </NativeSelectOption>
           ))}
-        </select>
+        </NativeSelect>
       </label>
-      <p>
+      <p className="text-sm text-muted-foreground">
         Showing {shown.length} of {providers.length} providers
       </p>
       {shown.length === 0 ? (
-        <p>No providers to show.</p>
+        <p className="text-sm text-muted-foreground">No providers to show.</p>
       ) : (
-        <ul>
+        <ul className="grid gap-4 sm:grid-cols-2">
           {shown.map((p) => (
             <li key={p.id}>
               <ProviderCard

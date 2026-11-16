@@ -18,7 +18,6 @@ export function ProviderEditPage() {
   useEffect(() => {
     if (!id) return;
     let ignore = false;
-    //setState({ kind: 'loading' })
     const load = async () => {
       try {
         const provider = await getProvider(id);
