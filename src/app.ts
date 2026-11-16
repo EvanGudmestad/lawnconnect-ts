@@ -25,4 +25,7 @@ app.get("/api/me", requireAuth, (req, res) => {
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
+app.get("/{*splat}", (_req, res) =>
+  res.sendFile(path.join(import.meta.dirname, "../frontend/dist/index.html")),
+);
 app.use(errorHandler);
