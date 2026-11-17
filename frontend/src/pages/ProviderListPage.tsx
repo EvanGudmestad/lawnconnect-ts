@@ -6,7 +6,7 @@ import {
   listProviders,
 } from "../api";
 import type { ProviderDraft } from "../api";
-import { AddProviderForm } from "../components/AddProviderForm";
+import { ProviderForm } from "../components/ProviderForm";
 import { ProviderList } from "../components/ProviderList";
 import type { Provider } from "../types";
 
@@ -70,7 +70,7 @@ export function ProviderListPage({ onSelect }: ProviderListPageProps) {
 
   return (
     <div>
-      <AddProviderForm onAdd={handleAdd} />
+      <ProviderForm onSave={handleAdd} />
       {actionError && <p role="alert">{actionError}</p>}
       {state.providers.length === 0 ? (
         <p>No providers yet. Add the first one.</p>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { ApiError, getProvider, updateProvider } from "../api";
 import type { ProviderDraft } from "../api";
-import { AddProviderForm } from "../components/AddProviderForm";
+import { ProviderForm, toFormValues } from "../components/ProviderForm";
 import type { Provider } from "../types";
 
 type LoadState =
@@ -52,9 +52,9 @@ export function ProviderEditPage() {
       {state.kind === "loading" && <p role="status">Loading provider…</p>}
       {state.kind === "error" && <p role="alert">{state.message}</p>}
       {state.kind === "loaded" && (
-        <AddProviderForm
-          onAdd={handleSave}
-          initial={state.provider}
+        <ProviderForm
+          onSave={handleSave}
+          initial={toFormValues(state.provider)}
           submitLabel="Save changes"
           clearOnSuccess={false}
         />

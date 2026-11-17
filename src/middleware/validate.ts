@@ -8,7 +8,7 @@ export function validateBody(schema: ZodType) {
       return res.status(400).json({
         error: "ValidationFailed",
         details: result.error.issues.map((issue) => ({
-          path: issue.path,
+          path: issue.path.join("."),
           message: issue.message,
         })),
       });

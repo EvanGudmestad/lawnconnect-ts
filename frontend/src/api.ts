@@ -1,14 +1,19 @@
 import { z } from "zod";
+import type { CreateProviderInput } from "./schemas/providerForm";
 import { providerSchema } from "./types";
 import type { Provider } from "./types";
 
+type FieldProblem = { path: string; message: string };
+
 export class ApiError extends Error {
   status: number;
+  details: FieldProblem[];
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, details: FieldProblem[] = []) {
     super(message);
     this.name = "ApiError";
     this.status = status;
+    this.details = details;
   }
 }
 
@@ -16,33 +21,31 @@ async function send(path: string, init?: RequestInit): Promise<Response> {
   const res = await fetch(path, init);
   if (!res.ok) {
     let message = `Request failed (${res.status})`;
+    let details: FieldProblem[] = [];
     try {
       const body: unknown = await res.json();
-      if (
-        typeof body === "object" &&
-        body !== null &&
-        "error" in body &&
-        typeof body.error === "string"
-      ) {
-        message = body.error;
+      if (typeof body === "object" && body !== null) {
+        if ("error" in body && typeof body.error === "string")
+          message = body.error;
+        if ("details" in body && Array.isArray(body.details))
+          details = body.details;
       }
     } catch {
       // The server did not send JSON. The generic message above is enough.
     }
-    throw new ApiError(res.status, message);
+    throw new ApiError(res.status, message, details);
   }
   return res;
 }
 
-export async function listProviders(): Promise<Provider[]> {
-  const res = await send("/providers");
-  return z.array(providerSchema).parse(await res.json());
+async function getJson<T>(
+  path: string,
+  schema: z.ZodType<T>,
+  init?: RequestInit,
+): Promise<T> {
+  const res = await send(path, init);
+  return schema.parse(await res.json());
 }
-
-export type ProviderDraft = Omit<
-  Provider,
-  "id" | "createdBy" | "updatedBy" | "updatedAt"
->;
 
 function withBody(method: string, body: unknown): RequestInit {
   return {
@@ -52,24 +55,27 @@ function withBody(method: string, body: unknown): RequestInit {
   };
 }
 
-export async function createProvider(draft: ProviderDraft): Promise<Provider> {
-  const res = await send("/providers", withBody("POST", draft));
-  return providerSchema.parse(await res.json());
-}
+export type ProviderDraft = CreateProviderInput;
 
-export async function deleteProvider(id: string): Promise<void> {
-  await send(`/providers/${id}`, { method: "DELETE" });
+export function listProviders(): Promise<Provider[]> {
+  return getJson("/providers", z.array(providerSchema));
 }
-
-export async function getProvider(id: string): Promise<Provider> {
-  const res = await send(`/providers/${id}`);
-  return providerSchema.parse(await res.json());
+export function getProvider(id: string): Promise<Provider> {
+  return getJson(`/providers/${id}`, providerSchema);
 }
-
-export async function updateProvider(
+export function createProvider(draft: ProviderDraft): Promise<Provider> {
+  return getJson("/providers", providerSchema, withBody("POST", draft));
+}
+export function updateProvider(
   id: string,
   changes: Partial<ProviderDraft>,
 ): Promise<Provider> {
-  const res = await send(`/providers/${id}`, withBody("PATCH", changes));
-  return providerSchema.parse(await res.json());
+  return getJson(
+    `/providers/${id}`,
+    providerSchema,
+    withBody("PATCH", changes),
+  );
+}
+export async function deleteProvider(id: string): Promise<void> {
+  await send(`/providers/${id}`, { method: "DELETE" });
 }
