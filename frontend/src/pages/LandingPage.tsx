@@ -16,14 +16,14 @@ import { Testimonial9 } from "@/components/testimonial9";
 
 // The navbar prints the title next to the picture, so its picture is only the leaf.
 const navLogo = {
-  url: "/home",
+  url: "/",
   src: "/lawnconnect-mark.svg",
   alt: "LawnConnect",
   title: "LawnConnect",
 };
 // The footer prints only the picture, so its picture has the name in it.
 const footerLogo = {
-  url: "/home",
+  url: "/",
   src: "/lawnconnect-logo.svg",
   alt: "LawnConnect",
   title: "LawnConnect",
@@ -37,15 +37,19 @@ export function LandingPage() {
       <Navbar1
         logo={navLogo}
         menu={[
-          { title: "Home", url: "/home" },
-          { title: "Find a provider", url: "/" },
+          { title: "Home", url: "/" },
+          { title: "Find a provider", url: "/browse" },
         ]}
+        auth={{
+          login: { title: "Sign in", url: "/sign-in" },
+          signup: { title: "Sign up", url: "/sign-up" },
+        }}
       />
       <Hero115
         heading="Your lawn, handled."
         description="Connect with local lawn care providers who serve your ZIP code. Compare services, pick a provider and get your weekend back."
         icon={<Sprout className="size-6" />}
-        buttons={{ primary: { text: "Find a provider", url: "/" } }}
+        buttons={{ primary: { text: "Find a provider", url: "/browse" } }}
         image={{
           src: "https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&q=80&w=1600",
           alt: "A freshly mowed lawn",
@@ -125,7 +129,7 @@ export function LandingPage() {
         description="Browse providers near you, or list your own lawn care business."
         buttons={{
           primary: { text: "Find a provider", url: "/" },
-          secondary: { text: "List your business", url: "#" },
+          secondary: { text: "List your business", url: "/sign-up" },
         }}
       />
       <Footer2
@@ -135,7 +139,7 @@ export function LandingPage() {
           {
             title: "LawnConnect",
             links: [
-              { name: "Find a provider", href: "/" },
+              { name: "Find a provider", href: "/browse" },
               { name: "Home", href: "/home" },
             ],
           },

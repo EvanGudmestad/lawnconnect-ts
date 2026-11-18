@@ -42,13 +42,13 @@ export function ProviderEditPage() {
   async function handleSave(draft: ProviderDraft) {
     if (!id) return;
     await updateProvider(id, draft);
-    navigate("/");
+    navigate("/browse");
   }
 
   return (
     <section>
       <h2>Edit provider</h2>
-      <Link to="/">Back to all providers</Link>
+      <Link to="/browse">Back to all providers</Link>
       {state.kind === "loading" && <p role="status">Loading provider…</p>}
       {state.kind === "error" && <p role="alert">{state.message}</p>}
       {state.kind === "loaded" && (
