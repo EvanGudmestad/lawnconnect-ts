@@ -1,7 +1,20 @@
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import { cn } from "@/lib/utils";
 import { useAuth } from "../auth/AuthContext";
+import { roles } from "../../../src/permissions";
 import { authClient } from "../lib/authClient";
 
 function linkClass({ isActive }: { isActive: boolean }) {
@@ -16,9 +29,10 @@ function linkClass({ isActive }: { isActive: boolean }) {
 // On a phone the links stack. From the "sm" width up they sit in a row.
 export function NavBar() {
   const auth = useAuth();
-
+  const navigate = useNavigate();
   async function handleSignOut() {
     await authClient.signOut();
+    navigate("/sign-in");
   }
 
   return (
@@ -32,20 +46,30 @@ export function NavBar() {
         </NavLink>
       )}
       {auth.status === "signed-in" && (
-        <span className="px-2 text-sm text-muted-foreground">
-          {auth.user.name}
-          {auth.user.role ? ` (${auth.user.role})` : " (no role yet)"}
-        </span>
-      )}
-      {auth.status === "signed-in" && (
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleSignOut}
-        >
-          Sign out
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={<Button type="button" variant="ghost" size="sm" />}
+          >
+            <Avatar className="size-6">
+              <AvatarFallback>
+                {auth.user.name.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            {auth.user.name}
+            {auth.user.role && auth.user.role in roles
+              ? ` (${auth.user.role})`
+              : " (no role yet)"}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>{auth.user.email}</DropdownMenuLabel>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleSignOut}>
+              Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       )}
       {auth.status === "signed-out" && (
         <NavLink to="/sign-in" className={linkClass}>

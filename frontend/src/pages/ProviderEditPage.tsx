@@ -4,6 +4,7 @@ import { ApiError, getProvider, updateProvider } from "../api";
 import type { ProviderDraft } from "../api";
 import { ProviderForm, toFormValues } from "../components/ProviderForm";
 import type { Provider } from "../types";
+import { useExpiredSession } from "../auth/useExpiredSession";
 
 type LoadState =
   | { kind: "loading" }
@@ -13,6 +14,7 @@ type LoadState =
 export function ProviderEditPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const handleExpired = useExpiredSession();
   const [state, setState] = useState<LoadState>({ kind: "loading" });
 
   useEffect(() => {
@@ -23,21 +25,25 @@ export function ProviderEditPage() {
         const provider = await getProvider(id);
         if (!ignore) setState({ kind: "loaded", provider });
       } catch (err) {
-        if (!ignore)
-          setState({
-            kind: "error",
-            message:
-              err instanceof ApiError
-                ? err.message
-                : "Could not reach the server",
-          });
+        if (ignore) return;
+        if (err instanceof ApiError && err.status === 401) {
+          void handleExpired();
+          return;
+        }
+        setState({
+          kind: "error",
+          message:
+            err instanceof ApiError
+              ? err.message
+              : "Could not reach the server",
+        });
       }
     };
     load();
     return () => {
       ignore = true;
     };
-  }, [id]);
+  }, [id, handleExpired]);
 
   async function handleSave(draft: ProviderDraft) {
     if (!id) return;

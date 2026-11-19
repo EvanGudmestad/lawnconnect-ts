@@ -1,8 +1,19 @@
-import { useState } from "react";
 import type { Provider } from "../types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type ProviderCardProps = {
   provider: Provider;
@@ -15,8 +26,6 @@ export function ProviderCard({
   onSelect,
   onDelete,
 }: ProviderCardProps) {
-  const [confirming, setConfirming] = useState(false);
-
   return (
     <article>
       <Card>
@@ -51,36 +60,32 @@ export function ProviderCard({
                 View
               </Button>
             )}
-            {onDelete && !confirming && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setConfirming(true)}
-              >
-                Delete
-              </Button>
-            )}
-            {onDelete && confirming && (
-              <span className="flex flex-wrap items-center gap-2 text-sm">
-                <span>Delete this listing?</span>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => onDelete(provider.id)}
+            {onDelete && (
+              <AlertDialog>
+                <AlertDialogTrigger
+                  render={<Button type="button" variant="ghost" size="sm" />}
                 >
-                  Yes, delete
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setConfirming(false)}
-                >
-                  Cancel
-                </Button>
-              </span>
+                  Delete
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete {provider.name}?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This removes the listing for everyone. It cannot be
+                      undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      variant="destructive"
+                      onClick={() => onDelete(provider.id)}
+                    >
+                      Yes, delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
           </div>
         </CardContent>
