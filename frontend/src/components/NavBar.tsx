@@ -46,6 +46,12 @@ export function NavBar() {
         </NavLink>
       )}
       {auth.status === "signed-in" && (
+        <NavLink to="/search" className={linkClass}>
+          Find a provider
+        </NavLink>
+      )}
+
+      {auth.status === "signed-in" && (
         <DropdownMenu>
           <DropdownMenuTrigger
             render={<Button type="button" variant="ghost" size="sm" />}

@@ -20,6 +20,18 @@ import { ProviderEditPage } from "./pages/ProviderEditPage";
 import { ProviderListPage } from "./pages/ProviderListPage";
 import { SignInPage } from "./pages/SignInPage";
 import { SignUpPage } from "./pages/SignUpPage";
+import { SearchPage } from "./pages/SearchPage";
+
+function SearchRoute() {
+  const navigate = useNavigate();
+  const handleExpired = useExpiredSession();
+  return (
+    <SearchPage
+      onSelect={(id) => navigate(`/edit/${id}`)}
+      onUnauthorized={handleExpired}
+    />
+  );
+}
 
 function Layout() {
   return (
@@ -89,6 +101,7 @@ export default function App() {
         <Route element={<RequireAuth />}>
           <Route path="browse" element={<ListRoute />} />
           <Route path="edit/:id" element={<ProviderEditPage />} />
+          <Route path="search" element={<SearchRoute />} />
         </Route>
 
         <Route path="sign-in" element={<SignInPage />} />
