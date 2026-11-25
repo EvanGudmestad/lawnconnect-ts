@@ -13,11 +13,20 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from "@/components/ui/native-select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapPin, SearchX, Wrench } from "lucide-react";
-import { ApiError, listProviders } from "../api";
+import { ApiError, searchProviders } from "../api";
 import { ProviderCard } from "../components/ProviderCard";
+import { pageOrOne, sortOrName } from "../searchParams";
+import type { Sort } from "../searchParams";
 import type { Provider } from "../types";
+
+// Five to a page, so the demo has a second page without hundreds of providers.
+const PAGE_SIZE = 5;
 
 type SearchPageProps = {
   onSelect?: (id: string) => void;
@@ -77,18 +86,42 @@ function SearchForm({ zip, service, onSearch }: SearchFormProps) {
   );
 }
 
-// The address is the single source of truth: /search?zip=63101&service=Mowing
-export function SearchPage({ onSelect, onUnauthorized }: SearchPageProps) {
-  const [params, setParams] = useSearchParams();
+type SearchResultsProps = {
+  zip: string;
+  service: string;
+  sort: Sort;
+  page: number;
+  onPage: (page: number) => void;
+  onSelect?: (id: string) => void;
+  onUnauthorized?: () => void;
+};
+
+// The page gives this component a key built from the whole address, so every
+// new address starts a fresh one that begins as loading. The old one is thrown
+// away, and its cleanup makes it ignore its late answer.
+function SearchResults({
+  zip,
+  service,
+  sort,
+  page,
+  onPage,
+  onSelect,
+  onUnauthorized,
+}: SearchResultsProps) {
   const [state, setState] = useState<LoadState>({ kind: "loading" });
-  const zip = params.get("zip") ?? "";
-  const service = params.get("service") ?? "";
 
   useEffect(() => {
     let ignore = false;
     const load = async () => {
       try {
-        const providers = await listProviders();
+        // The server compares the service exactly, and ours are stored in lowercase.
+        const providers = await searchProviders({
+          zip,
+          service: service.toLowerCase(),
+          sort,
+          page,
+          limit: PAGE_SIZE,
+        });
         if (!ignore) setState({ kind: "loaded", providers });
       } catch (err) {
         if (ignore) return;
@@ -109,26 +142,98 @@ export function SearchPage({ onSelect, onUnauthorized }: SearchPageProps) {
     return () => {
       ignore = true;
     };
-  }, [onUnauthorized]);
+  }, [zip, service, sort, page, onUnauthorized]);
 
-  function handleSearch(nextZip: string, nextService: string) {
-    const next = new URLSearchParams();
-    if (nextZip) next.set("zip", nextZip);
-    if (nextService) next.set("service", nextService);
-    setParams(next);
+  if (state.kind === "loading") {
+    return (
+      <div
+        role="status"
+        aria-label="Loading providers"
+        className="grid gap-4 sm:grid-cols-2"
+      >
+        <Skeleton className="h-32 rounded-xl" />
+        <Skeleton className="h-32 rounded-xl" />
+      </div>
+    );
+  }
+  if (state.kind === "error") {
+    return (
+      <p role="alert" className="text-sm text-destructive">
+        {state.message}
+      </p>
+    );
   }
 
-  const matches =
-    state.kind === "loaded"
-      ? state.providers.filter(
-          (p) =>
-            (zip === "" || p.serviceAreaZipCodes.includes(zip)) &&
-            (service === "" ||
-              p.servicesOffered.some(
-                (s) => s.toLowerCase() === service.toLowerCase(),
-              )),
-        )
-      : [];
+  const { providers } = state;
+  return (
+    <>
+      <p className="text-sm text-muted-foreground">
+        Page {page}: {providers.length}{" "}
+        {providers.length === 1 ? "provider" : "providers"}
+      </p>
+      {providers.length === 0 && (
+        <Empty className="border">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <SearchX />
+            </EmptyMedia>
+            <EmptyTitle>No providers here</EmptyTitle>
+            <EmptyDescription>
+              {page > 1
+                ? "There is nothing on this page. Try Previous."
+                : "Try a different ZIP code or service, or clear one of the boxes."}
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      )}
+      <ul className="grid gap-4 sm:grid-cols-2">
+        {providers.map((p) => (
+          <li key={p.id}>
+            <ProviderCard provider={p} onSelect={onSelect} />
+          </li>
+        ))}
+      </ul>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          disabled={page === 1}
+          onClick={() => onPage(page - 1)}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          disabled={providers.length < PAGE_SIZE}
+          onClick={() => onPage(page + 1)}
+        >
+          Next
+        </Button>
+      </div>
+    </>
+  );
+}
+
+// The address is the single source of truth:
+// /search?zip=63101&service=mowing&sort=-name&page=2
+export function SearchPage({ onSelect, onUnauthorized }: SearchPageProps) {
+  const [params, setParams] = useSearchParams();
+  const zip = params.get("zip") ?? "";
+  const service = params.get("service") ?? "";
+  const sort = sortOrName(params.get("sort"));
+  const page = pageOrOne(params.get("page"));
+
+  // Change one or two things in the address and keep the rest. A new filter or
+  // sort means a new list, so it goes back to page 1. Only Previous and Next
+  // pass keepPage as true.
+  function change(changes: Record<string, string>, keepPage = false) {
+    const next = new URLSearchParams(params);
+    for (const [key, value] of Object.entries(changes)) {
+      if (value === "") next.delete(key);
+      else next.set(key, value);
+    }
+    if (!keepPage) next.delete("page");
+    setParams(next);
+  }
 
   return (
     <section className="flex flex-col gap-4">
@@ -137,51 +242,34 @@ export function SearchPage({ onSelect, onUnauthorized }: SearchPageProps) {
         key={`${zip}|${service}`}
         zip={zip}
         service={service}
-        onSearch={handleSearch}
+        onSearch={(nextZip, nextService) =>
+          change({ zip: nextZip, service: nextService })
+        }
       />
-      {state.kind === "loading" && (
-        <div
-          role="status"
-          aria-label="Loading providers"
-          className="grid gap-4 sm:grid-cols-2"
+      <label className="flex flex-col gap-1 text-sm sm:w-48">
+        Sort by
+        <NativeSelect
+          value={sort}
+          onChange={(e) => change({ sort: e.target.value })}
         >
-          <Skeleton className="h-32 rounded-xl" />
-          <Skeleton className="h-32 rounded-xl" />
-        </div>
-      )}
-      {state.kind === "error" && (
-        <p role="alert" className="text-sm text-destructive">
-          {state.message}
-        </p>
-      )}
-      {state.kind === "loaded" && (
-        <>
-          <p className="text-sm text-muted-foreground">
-            {matches.length} providers match
-          </p>
-          {matches.length === 0 && (
-            <Empty className="border">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <SearchX />
-                </EmptyMedia>
-                <EmptyTitle>No providers match</EmptyTitle>
-                <EmptyDescription>
-                  Try a different ZIP code or service, or clear one of the
-                  boxes.
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
-          )}
-          <ul className="grid gap-4 sm:grid-cols-2">
-            {matches.map((p) => (
-              <li key={p.id}>
-                <ProviderCard provider={p} onSelect={onSelect} />
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
+          <NativeSelectOption value="name">Name A to Z</NativeSelectOption>
+          <NativeSelectOption value="-name">Name Z to A</NativeSelectOption>
+          <NativeSelectOption value="email">Email A to Z</NativeSelectOption>
+          <NativeSelectOption value="-email">Email Z to A</NativeSelectOption>
+        </NativeSelect>
+      </label>
+      <SearchResults
+        key={`${zip}|${service}|${sort}|${page}`}
+        zip={zip}
+        service={service}
+        sort={sort}
+        page={page}
+        onPage={(nextPage) =>
+          change({ page: nextPage === 1 ? "" : String(nextPage) }, true)
+        }
+        onSelect={onSelect}
+        onUnauthorized={onUnauthorized}
+      />
     </section>
   );
 }

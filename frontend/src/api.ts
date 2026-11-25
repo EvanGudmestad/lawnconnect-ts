@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { CreateProviderInput } from "./schemas/providerForm";
 import { providerSchema } from "./types";
 import type { Provider } from "./types";
+import type { Sort } from "./searchParams";
 
 type FieldProblem = { path: string; message: string };
 
@@ -60,6 +61,31 @@ export type ProviderDraft = CreateProviderInput;
 export function listProviders(): Promise<Provider[]> {
   return getJson("/providers", z.array(providerSchema));
 }
+
+export type SearchParams = {
+  zip?: string;
+  service?: string;
+  sort?: Sort;
+  page?: number;
+  limit?: number;
+};
+
+// Only the filters that have a value go into the address, so a default search
+// is just /providers and a filtered one is something like /providers?zip=63101&page=2
+export function searchProviders(params: SearchParams): Promise<Provider[]> {
+  const query = new URLSearchParams();
+  if (params.zip) query.set("zip", params.zip);
+  if (params.service) query.set("service", params.service);
+  if (params.sort) query.set("sort", params.sort);
+  if (params.page) query.set("page", String(params.page));
+  if (params.limit) query.set("limit", String(params.limit));
+  const text = query.toString();
+  return getJson(
+    `/providers${text ? `?${text}` : ""}`,
+    z.array(providerSchema),
+  );
+}
+
 export function getProvider(id: string): Promise<Provider> {
   return getJson(`/providers/${id}`, providerSchema);
 }
